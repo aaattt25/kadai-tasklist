@@ -9,7 +9,9 @@
         <div class="collapse navbar-collapse" id="nav-bar">
             <ul class="navbar-nav mr-auto"></ul>
             <ul class="navbar-nav">
-                <li>{!! link_to_route('tasks.create','新規タスクの投稿', null, ['class' => 'btn btn-secondary'])  !!}</li>
+                <!--<li>{!! link_to_route('tasks.create','新規タスクの投稿', null, ['class' => 'btn btn-secondary'])  !!}</li>-->
+                <li class="nav-item"><a href="#" class="nav-link">Signup</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Login</a></li>
             </ul>
         </div>
     </nav>
