@@ -13,13 +13,27 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        $tasks = Task::all();
+    {   
+        //ログインしているかチェックする
+        if (\Auth::check()) {
+            //ログイン中のユーザーを取得
+            $user = \Auth::user();
+            //ログイン中のユーザーのhasManyなTasksを取得->降順->ページネート10個
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
         
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+            $data = [
+                'user' =>$user,
+                'tasks' => $tasks,
+            ];
+            return view('tasks.index', $data); 
+        
+        //ログインしていない場合はwelcomへ
+        }else {
+        
+            return view('welcome'); 
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -28,12 +42,12 @@ class TasksController extends Controller
      */
     public function create()
     {
-        $task =new Task;
+            $task =new Task;
         
-        return view('tasks.create',[
-            'task' => $task,
-            ]);
-    }
+            return view('tasks.create',[
+                'task' => $task,
+                ]);
+        }
 
     /**
      * Store a newly created resource in storage.
@@ -47,15 +61,13 @@ class TasksController extends Controller
             'status'=>'required|max:10',
             'content'=>'required|max:191',
         ]);
-            
-        $task = new Task;
-        $task->status = $request->status;  //追加
-        $task->content = $request->content;
-        $task->save();
         
-        return redirect('/');
+            $request->user()->tasks()->create([
+                'content' =>$request->content,
+                'status' =>$request->status, 
+                ]);
+            return redirect('/');
     }
-
     /**
      * Display the specified resource.
      *
@@ -65,10 +77,13 @@ class TasksController extends Controller
     public function show($id)
     {
         $task = Task::find($id);
-        
-        return view('tasks.show',[
-            'task' => $task,
-            ]);
+        if(\Auth::id() === $task->user_id){  
+            return view('tasks.show',[
+                'task' => $task,
+                ]);
+        }else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -80,10 +95,14 @@ class TasksController extends Controller
     public function edit($id)
     {
         $task = Task::find($id);
-        
-        return view('tasks.edit',[
-            'task' => $task,
-        ]);
+        //ログイン中の人とtaskのuser_idが同じだったら
+        if(\Auth::id() === $task->user_id){       
+            return view('tasks.edit',[
+                'task' => $task,
+            ]);
+        }else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -101,11 +120,18 @@ class TasksController extends Controller
         ]);
         
         $task = Task::find($id);
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
+        //ログイン中の人とtaskのuser_idが同じだったら
+        if(\Auth::id() === $task->user_id){
+            $task->status = $request->status;
+            $task->content = $request->content;
+            //更新を保存する
+            $task->save();
         
-        return redirect('/');
+            return redirect('/');
+    
+        }else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -117,8 +143,16 @@ class TasksController extends Controller
     public function destroy($id)
     {
         $task = Task::find($id);
-        $task->delete();
+        if(\Auth::id() === $task->user_id){
+             $task->delete();
         
-        return redirect('/');
+             return redirect('/');
+        
+        //ログインしていない場合はwelcomへ
+        }else {
+        
+            return redirect('/'); 
+        }   
+       
     }
 }

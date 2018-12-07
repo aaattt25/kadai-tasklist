@@ -22,7 +22,7 @@
     {!! link_to_route('tasks.edit', 'このメッセージを編集', ['id' => $task->id], ['class' => 'btn btn-success']) !!}
     
     {!! Form::model($task, ['route' => ['tasks.destroy', $task->id], 'method' => 'delete']) !!}
-        {!! Form::submit('削除',['class' => 'btn btn-danger']) !!}
+    {!! Form::submit('削除',['class' => 'btn btn-danger mt-3']) !!}
     {!! Form::close() !!}
    
 @endsection

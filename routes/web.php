@@ -10,15 +10,14 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route::get('/', 'TasksController@index');
-
 //トップページ
-Route::get('/',function (){
-    return view('welcome');
-});
+Route::get('/', 'TasksController@index');
 
-// Route::resource('tasks','TasksController');
+// Route::get('/',function (){
+//      return view('welcome');
+//  });
+
+
 
 //ユーザー登録
 Route::get('signup','Auth\RegisterController@showRegistrationForm')->name('signup.get');
@@ -29,3 +28,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login')->name('login.post');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
 
+//ユーザー認証機能
+Route::group(['middleware' => 'auth'], function(){
+    Route::resource('tasks','TasksController');
+});
